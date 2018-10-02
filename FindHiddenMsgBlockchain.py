@@ -3,6 +3,7 @@
 #
 # Retrive Bitcoin raw blocks and decode it in order to find hidden messages
 # Script author: Chiheb Nexus
+# Modified for Bitcore (BTX): dalijolijo
 #
 
 from json import loads
@@ -13,12 +14,12 @@ import re
 
 class FindHiddenMsgBlockchain:
 	def __init__(self):	
-		url_raw = "http://btc.blockr.io/api/v1/block/raw/"
+		url_raw = "https://explorer.btx.zeltrez.io/api/block-index/"
 		parser = argparse.ArgumentParser(description = """
-		This script can decode hidden messages in Bitcoin's block raw transactions
+		This script can decode hidden messages in BitCore's block raw transactions
 		""")
-		parser.add_argument('-s', '--start', help = "First index of Bitcoin's block range", required = True, default = "1")
-		parser.add_argument('-f', '--final', help = "Last index of Bitcoin's block range", required = True, default = "2")
+		parser.add_argument('-s', '--start', help = "First index of BitCore's block range", required = True, default = "1")
+		parser.add_argument('-f', '--final', help = "Last index of BitCore's block range", required = True, default = "2")
 		parser.add_argument('-r', '--regex', help = "Catch only human readable characters", required = True, default = "n")
 		number = parser.parse_args()
 		
@@ -35,9 +36,8 @@ class FindHiddenMsgBlockchain:
 		try:
 			for number in range(int(start), int(stop)+1):
 				data = self.get_block_hash(url = url, block_number = str(number))
-				
-				print("[+] Fetching data for block: \tNumber: {0}\tHash: {1}".format(number, data["data"]["hash"]))
-				self.run_output(block_hash = data["data"]["hash"], file_name = str(number), reg = regex)
+				print("[+] Fetching data for block: \tNumber: {0}\tHash: {1}".format(number, data["blockHash"]))
+				self.run_output(block_hash = data["blockHash"], file_name = str(number), reg = regex)
 				print("-> Data fetched.")
 				
 		except (TypeError, NameError):
@@ -55,7 +55,7 @@ class FindHiddenMsgBlockchain:
 		return self.get_raw_block(url = url, block_hash = block_number)
 		
 	def run_output(self, block_hash = "", file_name = "", reg = ""):
-		url_explorer = "https://blockexplorer.com/api/rawblock/"
+		url_explorer = "https://explorer.btx.zeltrez.io/api/rawblock/"
 		n = 100 # Split the decoded output every 70 characters for better visualisation of the output file
 		
 		data = self.get_raw_block(url = url_explorer, block_hash = block_hash)
@@ -75,8 +75,8 @@ class FindHiddenMsgBlockchain:
 			print("Error occurred wile opening/writing into the file\n", e)
 		
 	def get_raw_block(self, url = "",  block_hash = ""):
-		# We'll use blockexplorer.com as Bitcoin explorer for our requests 
-		# in order to retrieve bitcoin's raw blocks
+		# We'll use explorer.btx.zeltrez.io as BitCore explorer for our requests 
+		# in order to retrieve bitcore's raw blocks
 		
 		try:
 			# Use your favorite User Agent
@@ -84,7 +84,6 @@ class FindHiddenMsgBlockchain:
 				"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36"})
 			response = urlopen(request)
 			data = loads(response.read().decode("utf8"))
-			
 			return data
 			
 		except Exception as e:
