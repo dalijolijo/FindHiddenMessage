@@ -11,6 +11,7 @@ from urllib.request import Request, urlopen
 from sys import exit
 import argparse
 import re
+import time
 
 class FindHiddenMsgBlockchain:
 	def __init__(self):	
@@ -39,6 +40,9 @@ class FindHiddenMsgBlockchain:
 				print("[+] Fetching data for block: \tNumber: {0}\tHash: {1}".format(number, data["blockHash"]))
 				self.run_output(block_hash = data["blockHash"], file_name = str(number), reg = regex)
 				print("-> Data fetched.")
+
+				# Wait for 2 seconds to avoid too many requests
+				time.sleep(2)
 				
 		except (TypeError, NameError):
 			print("Error occurred during fetching data")
